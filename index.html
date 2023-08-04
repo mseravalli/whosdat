@@ -3,26 +3,7 @@
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script>
-    var people = [
-      {
-        picture: "https://static.wikia.nocookie.net/spongebob/images/d/d7/SpongeBob_stock_art.png",
-        name: "Spongebob Squarepants",
-        answer: "",
-        answer_state: "unanswered",
-      },
-      {
-        picture: "https://static.wikia.nocookie.net/spongebob/images/9/9e/Gary_looking_up_stock_art.png",
-        name: "Gary the Snail",
-        answer: "",
-        answer_state: "unanswered",
-      },
-      {
-        picture: "https://static.wikia.nocookie.net/spongebob/images/5/5d/Patrick_stock_art.png",
-        name: "Patrick Star",
-        answer: "",
-        answer_state: "unanswered",
-      },
-    ];
+    var people = [];
 
     var pos = 0;
 
@@ -59,8 +40,13 @@
       load_question();
     }
 
-    // A $( document ).ready() block.
-    $( document ).ready(load_question);
+    $( document ).ready(function() {
+      $.get("http://localhost:8080", function(data, status) {
+        console.log(status);
+        people = data;
+        load_question();
+      });
+    });
 
   </script>
   <title>Whosdat</title>
