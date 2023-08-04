@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script>
+    var people = [
+      {
+        picture: "https://static.wikia.nocookie.net/spongebob/images/d/d7/SpongeBob_stock_art.png",
+        name: "Spongebob Squarepants",
+        answer: "",
+        answer_state: "unanswered",
+      },
+      {
+        picture: "https://static.wikia.nocookie.net/spongebob/images/9/9e/Gary_looking_up_stock_art.png",
+        name: "Gary the Snail",
+        answer: "",
+        answer_state: "unanswered",
+      },
+      {
+        picture: "https://static.wikia.nocookie.net/spongebob/images/5/5d/Patrick_stock_art.png",
+        name: "Patrick Star",
+        answer: "",
+        answer_state: "unanswered",
+      },
+    ];
+
+    var pos = 0;
+
+    function load_question() {
+      $("#mugshot").attr("src", people[pos].picture);
+      $("#name").prop('disabled', people[pos].answer_state == "answered");
+      $("#name").val(people[pos].answer);
+      if ($("#name").val().trim() != "" ) {
+        if ($("#name").val().trim() == people[pos].name) {
+          $("#result").text("Right!!");
+        } else {
+          $("#result").text("Wrong :(, it was: " + people[pos].name);
+        }
+      } else {
+          $("#result").text("");
+      }
+    }
+
+    function prev_question() {
+      pos = Math.max(pos - 1, 0);
+      load_question();
+    }
+
+    function next_question() {
+      pos = Math.min(pos + 1, people.length - 1);
+      load_question();
+    }
+
+    function check_question() {
+      if ($("#name").val().trim() != "") {
+        people[pos].answer = $("#name").val().trim();
+        people[pos].answer_state = "answered";
+      }
+      load_question();
+    }
+
+    // A $( document ).ready() block.
+    $( document ).ready(load_question);
+
+  </script>
+  <title>Whosdat</title>
+</head>
+<body>
+
+  <p>
+    <img id="mugshot" src="">
+  </p>
+  <p>
+    <form>
+      <label for="name">Name</label><br>
+      <input type="text" id="name" name="name"><br>
+    </form>
+  </p>
+  <p id="result"></p>
+  <p>
+    <form>
+      <button type="button" id="prev"  onclick="prev_question()" > prev  </button>
+      <button type="button" id="check" onclick="check_question()"> check </button>
+      <button type="button" id="next"  onclick="next_question()" > next  </button>
+    </form>
+  </p>
+
+</body>
+</html>
