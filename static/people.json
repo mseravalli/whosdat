@@ -1,8 +1,3 @@
-HTTP/1.1 200 OK
-Server: Netcat
-Access-Control-Allow-Origin: *
-Content-Type: application/json
-
 [
   {
     "picture": "https://static.wikia.nocookie.net/spongebob/images/d/d7/SpongeBob_stock_art.png",

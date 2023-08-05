@@ -41,7 +41,7 @@
     }
 
     $( document ).ready(function() {
-      $.get("http://localhost:8080", function(data, status) {
+      $.get("http://localhost:8080/people", function(data, status) {
         console.log(status);
         people = data;
         load_question();
