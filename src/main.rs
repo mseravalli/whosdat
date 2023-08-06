@@ -19,17 +19,12 @@ impl Person {
     }
 }
 
-async fn render_tmpl(data: web::Data<AppData>, req: HttpRequest) -> impl Responder {
+async fn render_tmpl(data: web::Data<AppData>) -> impl Responder {
     let mut ctx = Context::new();
     ctx.insert("protocol", &data.protocol);
     ctx.insert("domain", &data.domain);
     let rendered = data.tmpl.render("index.html", &ctx).unwrap();
     HttpResponse::Ok().body(rendered)
-}
-
-async fn index() -> Result<NamedFile> {
-    let path: PathBuf = PathBuf::from("static/index.html");
-    Ok(NamedFile::open(path)?)
 }
 
 async fn people() -> Result<HttpResponse> {
