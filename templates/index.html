@@ -3,6 +3,8 @@
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script>
+    var base_url = "{{protocol}}://{{domain}}";
+
     var people = [];
 
     var pos = 0;
@@ -40,10 +42,19 @@
       load_question();
     }
 
+    function generate_person(received_person) {
+      return {
+        "picture": base_url + "/" + received_person.picture,
+        "name": received_person.name,
+        "answer": "",
+        "answer_state": ""
+      };
+    }
+
     $( document ).ready(function() {
-      $.get("http://localhost:8080/people", function(data, status) {
+      $.get(base_url + "/people", function(data, status) {
         console.log(status);
-        people = data;
+        people = data.map(generate_person);
         load_question();
       });
     });
