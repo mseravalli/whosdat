@@ -1,6 +1,8 @@
 use actix_files::NamedFile;
+use actix_web::error;
 use actix_web::{HttpRequest, HttpResponse, Result};
 use rand::seq::SliceRandom;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -50,9 +52,13 @@ async fn people() -> Result<HttpResponse> {
 }
 
 async fn pics(req: HttpRequest) -> Result<NamedFile> {
-    let tmp: String = req.match_info().query("filename").parse().unwrap();
-    let path: PathBuf = PathBuf::from(format!("static/pics/{}", tmp));
-    // let path: PathBuf = req.match_info().query("filename").parse().unwrap();
+    let file_name: String = req.match_info().query("filename").parse().unwrap();
+    let re = Regex::new(r"\w+\.(jpg|jpeg|png)").expect("Invalid regex");
+    if !re.is_match(&file_name) {
+        println!("{}", file_name);
+        return Err(error::ErrorNotFound(format!("Not Found")));
+    }
+    let path: PathBuf = PathBuf::from(format!("static/pics/{}", file_name));
     Ok(NamedFile::open(path)?)
 }
 
