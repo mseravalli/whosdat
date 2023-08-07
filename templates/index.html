@@ -11,7 +11,6 @@
 
     function load_question() {
       $("#mugshot").attr("src", people[pos].picture);
-      // $("#name").prop('disabled', people[pos].answer_state == "answered");
       $("#name").val(people[pos].answer);
       if (people[pos].answer_state == "answered" ) {
         if ($("#name").val().trim().toLowerCase() == people[pos].name.toLowerCase()) {
