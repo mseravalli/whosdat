@@ -19,13 +19,13 @@
         } else {
           $("#result").text("Wrong :(, it was: " + people[pos].name);
         }
-
       } else if (people[pos].answer_state == "checking" ) {
           $("#result").text("The right name is: " + people[pos].name);
-          people[pos].answer_state = "";
       } else {
           $("#result").text("");
       }
+      people[pos].answer = "";
+      people[pos].answer_state = "";
     }
 
     function prev_question() {
