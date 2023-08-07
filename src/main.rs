@@ -73,7 +73,7 @@ struct Args {
     #[arg(short, long)]
     using_https: bool,
 
-    #[arg(short, long)]
+    #[arg(short, long, default_value = "0.0.0.0")]
     domain: String,
 
     #[arg(short, long, default_value_t = 8080)]
@@ -95,7 +95,7 @@ async fn main() -> std::io::Result<()> {
     let port = args.port;
 
     HttpServer::new(move || {
-        let tera = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*")).unwrap();
+        let tera = Tera::new("templates/**/*").unwrap();
         App::new()
             .data(AppData {
                 tmpl: tera,
@@ -107,7 +107,7 @@ async fn main() -> std::io::Result<()> {
             .route("/people", web::get().to(people))
             .route("/pics/{filename:.*}", web::get().to(pics))
     })
-    .bind((args.domain, args.port))?
+    .bind(("0.0.0.0", args.port))?
     .run()
     .await
 }
