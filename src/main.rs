@@ -1,6 +1,7 @@
 use actix_files::NamedFile;
 use actix_web::error;
 use actix_web::{web, HttpRequest, HttpResponse, Responder, Result};
+use clap::Parser;
 use rand::seq::SliceRandom;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -23,6 +24,7 @@ async fn render_tmpl(data: web::Data<AppData>) -> impl Responder {
     let mut ctx = Context::new();
     ctx.insert("protocol", &data.protocol);
     ctx.insert("domain", &data.domain);
+    ctx.insert("port", &data.port);
     let rendered = data.tmpl.render("index.html", &ctx).unwrap();
     HttpResponse::Ok().body(rendered)
 }
@@ -62,6 +64,20 @@ struct AppData {
     tmpl: Tera,
     protocol: String,
     domain: String,
+    port: u16,
+}
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    #[arg(short, long)]
+    using_https: bool,
+
+    #[arg(short, long)]
+    domain: String,
+
+    #[arg(short, long, default_value_t = 8080)]
+    port: u16,
 }
 
 // #[actix_web::main]
@@ -69,19 +85,29 @@ struct AppData {
 async fn main() -> std::io::Result<()> {
     use actix_web::{web, App, HttpServer};
 
-    HttpServer::new(|| {
+    let args = Args::parse();
+    let protocol = if args.using_https {
+        format!("https")
+    } else {
+        format!("http")
+    };
+    let domain = args.domain.clone();
+    let port = args.port;
+
+    HttpServer::new(move || {
         let tera = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*")).unwrap();
         App::new()
             .data(AppData {
                 tmpl: tera,
-                protocol: format!("http"),
-                domain: format!("localhost:8080"),
+                protocol: protocol.clone(),
+                domain: domain.clone(),
+                port,
             })
             .route("/", web::get().to(render_tmpl))
             .route("/people", web::get().to(people))
             .route("/pics/{filename:.*}", web::get().to(pics))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((args.domain, args.port))?
     .run()
     .await
 }

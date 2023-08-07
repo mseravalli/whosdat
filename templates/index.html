@@ -3,7 +3,7 @@
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script>
-    var base_url = "{{protocol}}://{{domain}}";
+    var base_url = "{{protocol}}://{{domain}}:{{port}}";
 
     var people = [];
 
@@ -11,14 +11,18 @@
 
     function load_question() {
       $("#mugshot").attr("src", people[pos].picture);
-      $("#name").prop('disabled', people[pos].answer_state == "answered");
+      // $("#name").prop('disabled', people[pos].answer_state == "answered");
       $("#name").val(people[pos].answer);
-      if ($("#name").val().trim() != "" ) {
-        if ($("#name").val().trim() == people[pos].name) {
+      if (people[pos].answer_state == "answered" ) {
+        if ($("#name").val().trim().toLowerCase() == people[pos].name.toLowerCase()) {
           $("#result").text("Right!!");
         } else {
           $("#result").text("Wrong :(, it was: " + people[pos].name);
         }
+
+      } else if (people[pos].answer_state == "checking" ) {
+          $("#result").text("The right name is: " + people[pos].name);
+          people[pos].answer_state = "";
       } else {
           $("#result").text("");
       }
@@ -35,7 +39,9 @@
     }
 
     function check_question() {
-      if ($("#name").val().trim() != "") {
+      if ($("#name").val().trim() == "") {
+        people[pos].answer_state = "checking";
+      } else {
         people[pos].answer = $("#name").val().trim();
         people[pos].answer_state = "answered";
       }
