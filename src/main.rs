@@ -24,7 +24,6 @@ async fn render_tmpl(data: web::Data<AppData>) -> impl Responder {
     let mut ctx = Context::new();
     ctx.insert("protocol", &data.protocol);
     ctx.insert("domain", &data.domain);
-    ctx.insert("port", &data.port);
     let rendered = data.tmpl.render("index.html", &ctx).unwrap();
     HttpResponse::Ok().body(rendered)
 }
@@ -64,7 +63,6 @@ struct AppData {
     tmpl: Tera,
     protocol: String,
     domain: String,
-    port: u16,
 }
 
 #[derive(Parser, Debug)]
@@ -73,11 +71,8 @@ struct Args {
     #[arg(short, long)]
     using_https: bool,
 
-    #[arg(short, long, default_value = "0.0.0.0")]
-    domain: String,
-
-    #[arg(short, long, default_value_t = 8080)]
-    port: u16,
+    #[arg(short, long)]
+    domain: Option<String>,
 }
 
 // #[actix_web::main]
@@ -91,8 +86,9 @@ async fn main() -> std::io::Result<()> {
     } else {
         format!("http")
     };
-    let domain = args.domain.clone();
-    let port = args.port;
+    let default_port = 8080;
+    let port = args.domain.as_ref().map(|_| 80).unwrap_or(default_port);
+    let domain = args.domain.unwrap_or(format!("localhost:{}", port));
 
     HttpServer::new(move || {
         let tera = Tera::new("templates/**/*").unwrap();
@@ -101,13 +97,12 @@ async fn main() -> std::io::Result<()> {
                 tmpl: tera,
                 protocol: protocol.clone(),
                 domain: domain.clone(),
-                port,
             })
             .route("/", web::get().to(render_tmpl))
             .route("/people", web::get().to(people))
             .route("/pics/{filename:.*}", web::get().to(pics))
     })
-    .bind(("0.0.0.0", args.port))?
+    .bind(("0.0.0.0", default_port))?
     .run()
     .await
 }
