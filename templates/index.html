@@ -19,7 +19,7 @@
           $("#result").text("Wrong :(, it was: " + people[pos].name);
         }
       } else if (people[pos].answer_state == "checking" ) {
-          $("#result").text("The right name is: " + people[pos].name);
+          $("#result").text(people[pos].name);
       } else {
           $("#result").text("");
       }
